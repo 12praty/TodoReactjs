@@ -11,5 +11,30 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String            @id @default(cuid())
+  email         String            @unique
+  password      String
+  todos         Todo[]
+  refreshToken  RefreshToken[]
+  createdAt     DateTime          @default(now())
+}
+
+model Todo {
+  id        String      @id @default(cuid())
+  title     String
+  done      Boolean     @default(false)
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id            String      @id @default(cuid())
+  token         String      @unique
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiredAt     DateTime
+  createdAt     DateTime    @default(now())
 }
